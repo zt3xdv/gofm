@@ -1,302 +1,141 @@
-# lastfm-cli
+# gofm
 
-A fast, minimal **command-line interface for Last.fm** written in Go.
+A small terminal CLI for checking a Last.fm user's recent tracks.
 
-The goal of this project is to provide a clean terminal interface for interacting with the Last.fm API: viewing scrobbles, checking currently playing tracks, and exploring listening statistics.
+`gofm` is a minimal Go command-line app that talks to the Last.fm API, stores your local config, and prints recent listening history in a clean terminal format.
 
----
+## What you get
 
-# Project Goals
-
-* Simple CLI interface
-* Fast execution (single binary)
-* Clean terminal output
-* No unnecessary dependencies
-* Works well on Linux systems
+- Automatic first-run setup for your Last.fm username and API key
+- Local config stored in your XDG config directory
+- Recent-track lookup for your saved user or any username you pass explicitly
+- Simple single-binary workflow
+- No auth flow or session handling required for read-only lookups
 
 ---
 
-# Core Features (MVP)
+## Install
 
-Implement these first.
+### Option 1: Download from Releases
 
-### 1. Configuration
+Open [Releases](https://github.com/theOldZoom/gofm/releases) and download the file for your system:
 
-Store configuration locally.
+| I use...              | Download this file  |
+| --------------------- | ------------------- |
+| Linux (x86_64)        | `gofm-linux-amd64`  |
+| Linux (ARM64)         | `gofm-linux-arm64`  |
+| macOS (Intel)         | `gofm-darwin-amd64` |
+| macOS (Apple Silicon) | `gofm-darwin-arm64` |
+| Windows (x86_64)      | `gofm-windows-amd64.exe` |
+| Windows (ARM64)       | `gofm-windows-arm64.exe` |
 
-Config file:
+Then make it executable and run it:
 
+```bash
+chmod +x gofm-linux-amd64
+./gofm-linux-amd64 recent
 ```
-~/.config/lastfm-cli/config.yaml
+
+### Option 2: Install to `~/.local/bin`
+
+This installs the latest matching release as `~/.local/bin/gofm`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/theoldzoom/gofm/master/install.sh | sh
 ```
 
-Example:
+If `~/.local/bin` is already in your `PATH`, you can then run:
 
+```bash
+gofm recent
 ```
-api_key: YOUR_LASTFM_API_KEY
-username: YOUR_LASTFM_USERNAME
+
+### Option 3: Build from source
+
+You need [Go](https://go.dev/) installed.
+
+```bash
+git clone https://github.com/theOldZoom/gofm.git
+cd gofm
+make build
+./build/gofm recent
 ```
 
-Tasks:
+## Usage
 
-* load config file
-* fallback to environment variables
-* allow command to initialize config
+If no config exists yet, `gofm` launches interactive setup and saves your details to:
 
-Command:
-
+```text
+~/.config/gofm/config.yaml
 ```
-lastfm init
+
+Example config:
+
+```yaml
+username: your_lastfm_username
+api_key: your_lastfm_api_key
 ```
+
+### API key
+
+`gofm` needs a Last.fm API key for requests to the Last.fm API.
+
+Create one here:
+
+[Last.fm API account page](https://www.last.fm/api/account/create)
+
+or view your accounts here:
+
+[https://www.last.fm/api/accounts](https://www.last.fm/api/accounts)
+
+
+
+## Notes
+
+- Recent tracks are fetched from the Last.fm `user.getRecentTracks` endpoint
+- First-run setup validates both your API key and username before saving config
+- Use `--config` to point to a custom config file if needed
+- `gofm` also reads environment variables through Viper, so `USERNAME` and `API_KEY` can be used as fallbacks
+- The project currently focuses on read-only lookups
 
 ---
 
-### 2. Recent Tracks
+## Tech stack
 
-Command:
-
-```
-lastfm recent
-```
-
-Example output:
-
-```
-1. Radiohead — Paranoid Android
-2. Massive Attack — Teardrop
-3. Daft Punk — Voyager
-```
-
-API endpoint:
-
-```
-user.getRecentTracks
-```
-
-Tasks:
-
-* fetch recent tracks
-* parse JSON
-* print clean terminal output
+- [Go](https://go.dev/)
+- [Cobra](https://github.com/spf13/cobra) for the CLI
+- [Viper](https://github.com/spf13/viper) for configuration
+- `net/http` from the Go standard library for API requests
 
 ---
 
-### 3. Currently Playing
+## TODO
 
-Command:
-
-```
-lastfm now
-```
-
-Output example:
-
-```
-Now playing:
-Daft Punk — Digital Love
-Album: Discovery
-```
-
-Implementation:
-
-* call `user.getRecentTracks`
-* check `@attr.nowplaying`
+- Add a `now` command for currently playing tracks
+- Add top artists and top tracks commands
+- Improve terminal formatting for track output
+- Support JSON output for scripting
+- Add tests for config loading and API calls
 
 ---
 
-### 4. Top Artists
+## Contributing
 
-Command:
+Contributions are welcome.
 
-```
-lastfm top artists
-```
-
-Example output:
-
-```
-1. Radiohead
-2. Daft Punk
-3. Massive Attack
+```bash
+git clone https://github.com/theOldZoom/gofm.git
+cd gofm
+go build ./...
 ```
 
-API endpoint:
+Before opening a PR:
 
-```
-user.getTopArtists
-```
+- Keep changes focused
+- Run `go test ./...`
+- Run `go build ./...`
+- Follow the existing project style
 
----
+## License
 
-# CLI Structure
-
-Recommended structure:
-
-```
-lastfm-cli/
-├─ cmd/
-│  ├─ root.go
-│  ├─ now.go
-│  ├─ recent.go
-│  └─ top.go
-│
-├─ internal/
-│  ├─ api/
-│  │  └─ client.go
-│  ├─ config/
-│  │  └─ config.go
-│  └─ models/
-│     └─ track.go
-│
-├─ main.go
-└─ go.mod
-```
-
----
-
-# API Client
-
-Create a reusable client:
-
-```
-type Client struct {
-    APIKey string
-}
-```
-
-Base URL:
-
-```
-https://ws.audioscrobbler.com/2.0/
-```
-
-Requests should include:
-
-```
-method
-api_key
-format=json
-```
-
-Example:
-
-```
-user.getRecentTracks
-```
-
----
-
-# Libraries
-
-Recommended Go libraries:
-
-CLI framework:
-
-* Cobra
-
-Configuration:
-
-* Viper
-
-HTTP:
-
-* net/http (standard library)
-
----
-
-# Development Steps (Do Tomorrow)
-
-1. Initialize Go module
-2. Create CLI structure
-3. Implement config loader
-4. Build API client
-5. Implement `recent` command
-6. Implement `now` command
-7. Implement `top artists`
-8. Improve output formatting
-
----
-
-# Future Features
-
-Ideas to add later.
-
-### Watch Mode
-
-```
-lastfm watch
-```
-
-Live updates of currently playing track.
-
----
-
-### Export Scrobbles
-
-```
-lastfm export --format csv
-```
-
-Download listening history.
-
----
-
-### Terminal Dashboard
-
-Add a TUI mode:
-
-```
-lastfm tui
-```
-
-Possible library:
-
-* Bubble Tea
-
-Dashboard could show:
-
-* current track
-* recent scrobbles
-* top artists
-* listening stats
-
----
-
-# Installation
-
-Build locally:
-
-```
-go build -o lastfm
-```
-
-Install:
-
-```
-install -Dm755 lastfm ~/.local/bin/lastfm
-```
-
----
-
-# Long-Term Ideas
-
-* caching API responses
-* colored terminal output
-* album artwork support
-* support for authentication actions
-* scrobbling from CLI
-
----
-
-# Notes
-
-* The Last.fm API key is safe to include in local configs
-* Authenticated actions require a session key
-* Respect API rate limits
-* Avoid unnecessary requests
-
----
-
-# End Goal
-
-Create a **fast, minimal, Unix-friendly Last.fm CLI** that behaves similarly to tools like `gh` or `yt-dlp`, but focused on music listening data.
+MIT. See `[LICENSE](LICENSE)`.
