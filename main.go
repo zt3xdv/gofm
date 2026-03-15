@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "gofm/cmd"
+import "github.com/theOldZoom/gofm/cmd"
 
 func main() {
 	cmd.Execute()

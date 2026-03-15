@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"gofm/internal/api"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/theOldZoom/gofm/internal/api"
 
 	"go.yaml.in/yaml/v3"
 )

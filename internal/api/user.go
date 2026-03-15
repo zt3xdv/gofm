@@ -1,8 +1,9 @@
 package api
 
 import (
-	"gofm/internal/models"
 	"strconv"
+
+	"github.com/theOldZoom/gofm/internal/models"
 
 	"github.com/spf13/viper"
 )

@@ -24,8 +24,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"gofm/internal/config"
 	"os"
+
+	"github.com/theOldZoom/gofm/internal/config"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

@@ -1,4 +1,4 @@
-module gofm
+module github.com/theOldZoom/gofm
 
 go 1.25.0
 

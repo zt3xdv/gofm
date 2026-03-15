@@ -23,7 +23,8 @@ package cmd
 
 import (
 	"fmt"
-	"gofm/internal/api"
+
+	"github.com/theOldZoom/gofm/internal/api"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
