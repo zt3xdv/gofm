@@ -23,10 +23,10 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/theOldZoom/gofm/internal/config"
+	"github.com/theOldZoom/gofm/internal/tui/setup"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,7 +39,6 @@ var rootCmd = &cobra.Command{
 	Short: "A CLI for Last.fm",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello, World!")
 	},
 }
 
@@ -79,11 +78,8 @@ func initConfig() {
 		cobra.CheckErr(err)
 	}
 
-	fmt.Println("Welcome to GoFM. Let's setup your configuration, shall we?")
-	cfg, err := config.RunSetup()
+	cfg, err := setup.Run()
 	cobra.CheckErr(err)
-
-	fmt.Println("Setup complete.")
 
 	viper.Set("username", cfg.Username)
 	viper.Set("api_key", cfg.ApiKey)
