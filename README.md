@@ -108,13 +108,70 @@ or view your accounts here:
 
 ---
 
-## TODO
+Here’s a more structured, actionable, and hierarchical **TODO for your Last.fm CLI**, reflecting commands, subcommands, flags, and implementation priorities. This is closer to a “developer roadmap” than a flat list.
 
-- Add a `now` command for currently playing tracks
-- Add top artists and top tracks commands
-- Improve terminal formatting for track output
-- Support JSON output for scripting
-- Add tests for config loading and API calls
+---
+
+## GoFM TODO 
+
+### 1. Core Commands (Must-Have)
+
+* `now` – Show currently playing track
+
+  * Flags: `--user`, `--json`, `--verbose`
+* `recent` – Show recently played tracks
+
+  * Flags: `--user`, `--limit`, `--json`
+
+### 2. Top Lists
+
+* `top artists` – Show user’s top artists
+* `top tracks` – Show user’s top tracks
+* Shared flags: `--user`, `--limit`, `--period`, `--json`
+
+### 3. Info Commands
+
+* `info artist <name>` – Show bio, tags, stats
+* `info track <artist> <track>` – Show track info, playcount, listeners
+* `info album <artist> <album>` – Show album details and tags
+* Flags: `--json`, `--verbose`
+
+### 4. User & Stats
+
+* `user info <username>` – Show general user stats
+* `stats weekly` – Show weekly listening stats
+* `stats monthly` – Show monthly listening stats
+* `stats favorite` – Show most played track/artist/album
+* Flags: `--user`, `--json`, `--limit`
+
+### 5. Interaction Commands
+
+* `love <track>` / `unlove <track>` – Mark tracks as loved/unloved
+* `scrobble <track> <artist>` – Manually scrobble a track
+* `tag track <track>` / `album <album>` / `artist <artist>` – Add/remove tags
+
+### 6. Advanced Features
+
+* `compare <user1> <user2>` – Compare top tracks/artists
+* `trending` – Show trending tracks/artists globally
+* `recommend` – Suggest tracks based on top artists
+* `playlist export <format>` – Export top tracks to M3U/CSV
+
+
+### 7. Output & UX Improvements
+
+* Support JSON output globally (`--json`)
+* Add terminal formatting: tables, colors, alignment
+* Pagination for long lists
+* Optional ASCII or tiny cover art in terminal
+* Verbose/debug mode for API requests (`--verbose`)
+
+### 8. Developer & Maintenance
+
+* Add tests for config loading and API calls
+* Add caching for repeated API requests
+* Automatic rate-limit handling or retries
+
 
 ---
 
