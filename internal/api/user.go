@@ -33,6 +33,28 @@ func GetRecentTracks(username string, limit int) ([]models.Track, error) {
 	return tracks, nil
 }
 
+func GetNowPlaying(username string) (*models.Track, error) {
+	client := &Client{
+		ApiKey: viper.GetString("api_key"),
+	}
+	var resp models.RecentTracksResponse
+
+	err := client.Get("user.getRecentTracks", map[string]string{
+		"user":  username,
+		"limit": "1",
+	}, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	tracks := resp.RecentTracks.Track
+	if len(tracks) > 0 && tracks[0].Attr.NowPlaying == "true" {
+		return &tracks[0], nil
+	}
+
+	return nil, nil
+}
+
 func GetInfo(username string) (*models.UserGetInfoResponse, error) {
 	client := &Client{
 		ApiKey: viper.GetString("api_key"),
