@@ -32,11 +32,14 @@ import (
 
 var recentCmd = &cobra.Command{
 	Use:   "recent [username]",
-	Short: "A brief description of your command",
-	Args:  cobra.MaximumNArgs(1),
+	Short: "Show recently played tracks",
 
 	Run: func(cmd *cobra.Command, args []string) {
 		username := viper.GetString("username")
+		limit, err := cmd.Flags().GetInt("limit")
+		if err != nil {
+			limit = 10
+		}
 		if len(args) == 1 {
 			username = args[0]
 		}
@@ -45,7 +48,7 @@ var recentCmd = &cobra.Command{
 			return
 		}
 
-		tracks, err := api.GetRecentTracks(username, 10)
+		tracks, err := api.GetRecentTracks(username, limit)
 		if err != nil {
 			fmt.Println("Failed to get recent tracks:", err)
 			return
@@ -58,4 +61,5 @@ var recentCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(recentCmd)
+	recentCmd.Flags().IntP("limit", "l", 10, "Number of tracks to show")
 }

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"strconv"
+	"fmt"
 
 	"github.com/theOldZoom/gofm/internal/models"
 
@@ -16,17 +16,26 @@ func GetRecentTracks(username string, limit int) ([]models.Track, error) {
 
 	err := client.Get("user.getRecentTracks", map[string]string{
 		"user":  username,
-		"limit": strconv.Itoa(limit),
+		"limit": fmt.Sprintf("%d", limit),
 	}, &resp)
 	if err != nil {
 		return nil, err
 	}
-	return resp.RecentTracks.Track, nil
+
+	tracks := resp.RecentTracks.Track
+	if len(tracks) > 0 && tracks[0].Attr.NowPlaying == "true" {
+		tracks = tracks[1:]
+	}
+	if len(tracks) > limit {
+		tracks = tracks[:limit]
+	}
+
+	return tracks, nil
 }
 
-func GetInfo(username string, apiKey string) (*models.UserGetInfoResponse, error) {
+func GetInfo(username string) (*models.UserGetInfoResponse, error) {
 	client := &Client{
-		ApiKey: apiKey,
+		ApiKey: viper.GetString("api_key"),
 	}
 	var resp models.UserGetInfoResponse
 
@@ -59,6 +68,17 @@ func ValidateAPIKey(apiKey string) error {
 }
 
 func ValidateUsername(username string, apiKey string) error {
-	_, err := GetInfo(username, apiKey)
-	return err
+	client := &Client{
+		ApiKey: apiKey,
+	}
+	var resp models.UserGetInfoResponse
+
+	err := client.Get("user.getInfo", map[string]string{
+		"user": username,
+	}, &resp)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
